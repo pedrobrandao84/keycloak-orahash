@@ -17,7 +17,7 @@ public class DataBaseProperties {
         this.nameDb = nameDb;
         this.userDb = userDb;
         this.passwordDb = passwordDb;
-        this.jdbcUrl = "jdbc:oracle:thin:@" + hostDb + ":" + portDb + ":" + nameDb;
+        this.jdbcUrl = "jdbc:oracle:thin:@" + hostDb + ":" + portDb + "/" + nameDb;
     }
 
     public DataBaseProperties() {
