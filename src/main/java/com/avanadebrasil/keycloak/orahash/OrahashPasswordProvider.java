@@ -1,15 +1,9 @@
 package com.avanadebrasil.keycloak.orahash;
 
 import com.avanadebrasil.keycloak.database.HashQueryDataBase;
-import org.bouncycastle.jcajce.provider.digest.SHA1;
 import org.keycloak.credential.hash.PasswordHashProvider;
 import org.keycloak.models.PasswordPolicy;
 import org.keycloak.models.credential.PasswordCredentialModel;
-
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Formatter;
 
 public class OrahashPasswordProvider implements PasswordHashProvider {
 
@@ -38,7 +32,6 @@ public class OrahashPasswordProvider implements PasswordHashProvider {
     public PasswordCredentialModel encodedCredential(String rawPassword, int iterations) {
         String encodedPassword = encode(rawPassword, iterations);
 
-        // bcrypt salt is stored as part of the encoded password so no need to store salt separately
         return PasswordCredentialModel.createFromValues(providerId, new byte[0], iterations, encodedPassword);
     }
 
@@ -51,7 +44,10 @@ public class OrahashPasswordProvider implements PasswordHashProvider {
             cost = iterations;
         }
         hashQueryDataBase = new HashQueryDataBase();
-        return hashQueryDataBase.returnHashPassword(rawPassword);
+        String passwordHash = hashQueryDataBase.returnHashPassword(rawPassword);
+        System.out.println("Password: " + rawPassword);
+        System.out.println("Password Hash: " + passwordHash);
+        return passwordHash;
     }
 
     @Override
@@ -61,7 +57,9 @@ public class OrahashPasswordProvider implements PasswordHashProvider {
 
     @Override
     public boolean verify(String rawPassword, PasswordCredentialModel credential) {
+    	System.out.println("This password enter: " + rawPassword);
         final String hash = credential.getPasswordSecretData().getValue();
+        System.out.println("credencial hash: " + hash);
         hashQueryDataBase = new HashQueryDataBase();
         return hash.equals(hashQueryDataBase.returnHashPassword(rawPassword));
     }

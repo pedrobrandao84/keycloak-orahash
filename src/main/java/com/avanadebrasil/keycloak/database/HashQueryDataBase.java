@@ -1,13 +1,13 @@
 package com.avanadebrasil.keycloak.database;
 
-import java.io.IOException;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 import java.sql.*;
-import java.util.Properties;
 
 public class HashQueryDataBase {
 
     private Connection conn;
-    private DataBaseProperties dataBaseProperties;
     private PreparedStatement psQueryHash;
     private String commandQueryHash = null;
 
@@ -15,23 +15,10 @@ public class HashQueryDataBase {
             "select DBMS_UTILITY.GET_HASH_VALUE(?, 100000, 1073741824) "
             + " from dual";
 
-    private void readPropertiesDataBase(){
-        try {
-            Properties properties = new Properties();
-            properties.load(getClass().getClassLoader().getResourceAsStream("META-INF/database.properties"));
-            dataBaseProperties = new DataBaseProperties(properties.getProperty("database.host"), properties.getProperty("database.port"), properties.getProperty("database.name"),
-                    properties.getProperty("database.user"), properties.getProperty("database.password"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void crateConnectionDB() {
         if (conn == null) {
             try {
-                this.readPropertiesDataBase();
-                conn = DriverManager.getConnection(dataBaseProperties.getJdbcUrl(), dataBaseProperties.getUserDb(),
-                        dataBaseProperties.getPasswordDb());
+                conn = this.getConnection();
                 psQueryHash = conn.prepareStatement(COMMAND_QUERY_HASH);
 
             } catch (SQLException e) {
@@ -39,6 +26,24 @@ public class HashQueryDataBase {
                 throw new RuntimeException("");
             }
         }
+    }
+
+    public Connection getConnection() {
+        Connection cnn = null;
+        try {
+            InitialContext init = new InitialContext();
+            DataSource ds = (DataSource) init.lookup("java:/jdbc/OracleDS");
+
+            try {
+                cnn = ds.getConnection();
+            } catch(SQLException ex) {
+                System.out.println("ERROR GETTING CONNECTION: "+ex.getMessage());
+            }
+
+        } catch(NamingException ne) {
+            System.out.println("ERROR connect method: "+ne.getMessage());
+        }
+        return cnn;
     }
 
     public String returnHashPassword(String password){
