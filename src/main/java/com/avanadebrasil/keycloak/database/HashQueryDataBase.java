@@ -20,7 +20,6 @@ public class HashQueryDataBase {
             try {
                 conn = this.getConnection();
                 psQueryHash = conn.prepareStatement(COMMAND_QUERY_HASH);
-
             } catch (SQLException e) {
                 e.printStackTrace();
                 throw new RuntimeException("");
@@ -66,7 +65,22 @@ public class HashQueryDataBase {
                     throwables.printStackTrace();
                 }
             }
+            this.closeConnections();
             return hashPassord;
+        }
+    }
+
+    public void closeConnections(){
+        try {
+            if(this.conn != null){
+                this.conn.close();
+                this.conn = null;
+            }
+            if(this.psQueryHash != null){
+                this.psQueryHash.close();
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
     }
 
