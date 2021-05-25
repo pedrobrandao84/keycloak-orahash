@@ -31,7 +31,7 @@ public class HashQueryDataBase {
         Connection cnn = null;
         try {
             InitialContext init = new InitialContext();
-            DataSource ds = (DataSource) init.lookup("java:/jdbc/OracleDS");
+            DataSource ds = (DataSource) init.lookup("java:jboss/datasources/KeycloakDS");
 
             try {
                 cnn = ds.getConnection();
